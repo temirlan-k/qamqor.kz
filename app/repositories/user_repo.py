@@ -1,9 +1,10 @@
 
 from typing import Optional, Type, Generic, TypeVar, List
+from uuid import UUID
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from utils.hash import hash_password
+from utils.hash import hash_password, verify_password
 from models.user import User
 from schemas.user import UserCreateIn
 from sqlalchemy import insert
@@ -33,13 +34,23 @@ class UserRepository:
         self.db_session = db_session
 
 
-    async def check_user_exist(self,username:str,email:str)-> bool:
-        stmt = await self.db_session.execute(select(User).where(User.username == username or User.email == email))
+    async def check_user_exist(self,username_or_email:str)-> bool:
+        stmt = await self.db_session.execute(select(User).where(User.username == username_or_email or User.email == username_or_email))
         res = stmt.scalars().first() is not None
         return res
 
+    
+    async def get_user_by_username_or_email(self, username_or_email: str):
+        stmt = await self.db_session.execute(select(User).where((User.username == username_or_email) | (User.email == username_or_email)))
+        res = stmt.scalars().first()
+        if res is None:
+            raise HTTPException(status_code=404,detail="User not found") 
+        print(res)
+        return res
+    
 
-    async def get_by_id(self, id: str) -> User:
+
+    async def get_by_id(self, id: str):
         stmt = await self.db_session.execute(select(User).filter(User.id==id))
         res = stmt.scalars().first()
         if not res:

@@ -11,6 +11,12 @@ class Settings(BaseSettings):
     SECRET_KEY:str =  os.getenv('SECRET_KEY')
     HASHING_ALGORITHM:str = os.getenv('HASHING_ALGORITHM')
 
+    AWS_BUCKET_NAME: str=str(os.getenv('AWS_BUCKET_NAME'))
+    AWS_REGION:str =str(os.getenv('AWS_REGION'))
+    AWS_ACCESS_KEY:str =str(os.getenv('AWS_ACCESS_KEY'))
+    AWS_SECRET_KEY:str =str(os.getenv('AWS_SECRET_KEY'))
+
+
     class Config:
         env_file = ".env"
         extra = "allow"

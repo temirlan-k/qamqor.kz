@@ -5,6 +5,8 @@ from fastapi import HTTPException
 from models.product import Product
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+
+
 class ProductProtocol(Protocol):
 
     async def get_product_by_id(self, id: str) -> Optional[Product]:
@@ -18,7 +20,6 @@ class ProductProtocol(Protocol):
     
 
 class ProductRepository:
-
     
     def __init__(self, db_session:AsyncSession):
         self.db_session = db_session

@@ -19,8 +19,9 @@ class UserPrivateIn(UserBase):
     hashed_password: str
 
 
-class UserLoginIn(UserBase):
-    id:str
+class UserLoginIn(BaseModel):
+    username_or_email:str
+    password:str
 
 class UserCreateOut(UserBase):
-    pass
+    access_token:str
