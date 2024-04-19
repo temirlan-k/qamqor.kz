@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 import uvicorn
 from routers.user import router as user_router
+from routers.product import router as product_router
 import logging
 import sys
 from contextlib import asynccontextmanager
@@ -16,6 +17,7 @@ async def lifespan(app: FastAPI):
 def create_app()->FastAPI:
     app = FastAPI(docs_url='/',lifespan=lifespan)
     app.include_router(router = user_router)
+    app.include_router(router= product_router)
     return app
 
 app = create_app()
