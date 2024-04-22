@@ -13,7 +13,6 @@ from sqlalchemy.orm import declarative_base
 Base = declarative_base()
 
 
-
 class DatabaseSessionManager:
     def __init__(self, host: str, engine_kwargs: dict[str, Any] = {}):
         self._engine = create_async_engine(host, **engine_kwargs)
@@ -55,6 +54,7 @@ class DatabaseSessionManager:
 
 
 sessionmanager = DatabaseSessionManager(settings.POSTGRES_URL, {"echo": True})
+
 
 async def get_db_session():
     async with sessionmanager.session() as session:

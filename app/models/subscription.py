@@ -14,11 +14,11 @@ if TYPE_CHECKING:
     from .category import Category
     from .user import User
     from .product import Product
-    
 
 
 class Subscription(Base):
-    __tablename__ = 'subscriptions'
+    __tablename__ = "subscriptions"
 
-    id: so.Mapped[uuid.UUID] = so.mapped_column(default=uuid.uuid4,primary_key=True,index=True,unique=True)
-    
+    id: so.Mapped[uuid.UUID] = so.mapped_column(
+        default=uuid.uuid4, primary_key=True, index=True, unique=True
+    )
