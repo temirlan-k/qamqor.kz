@@ -1,24 +1,26 @@
 import json
 from functools import wraps
-from uuid import UUID
+from functools import wraps
 
-def cache_redis(key_prefix: str, expire: int):
+from utils.decarators.encoder import CustomEncoder
+
+def cache_redis(key_prefix: str, cache_type: str, expire: int):
     def decorator(func):
         @wraps(func)
         async def wrapper(self, *args, **kwargs):
-            product_id = args[0] if args else kwargs.get('id')
-            cache_key = f"{key_prefix}:{product_id}"
+            cache_key = f"{key_prefix}:{kwargs.get('id', '')}" if cache_type == 'details' else key_prefix
             cached_data = await self.redis.get(cache_key)
-            print(cache_key)
-
             if cached_data:
-                print('Data retrieved from Redis cache')
+                print(f'Data retrieved from Redis cache for key {cache_key}')
                 return json.loads(cached_data)
             result = await func(self, *args, **kwargs)
             if result:
-                await self.redis.set(cache_key, json.dumps(result), ex=expire)
-                print('Data cached in Redis')
-            
+                try:
+                    serialized_data = json.dumps(result, cls=CustomEncoder)
+                    await self.redis.set(cache_key, serialized_data, ex=expire)
+                    print(f'Data cached in Redis for key {cache_key}')
+                except TypeError as e:
+                    print(f"Error serializing data: {e}")
             return result
         return wrapper
     return decorator

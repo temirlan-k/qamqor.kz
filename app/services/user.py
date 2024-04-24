@@ -46,7 +46,7 @@ class UserService:
         new_user = await self.user_repository.insert_user(user_data)
         return signJWT(new_user.id, new_user.username)
 
-    @cache_redis(key_prefix='user',expire=30)
+    @cache_redis(key_prefix='user',cache_type='details',expire=30)
     async def get_current_user(self, token: str = Depends(JWTBearer())) -> dict:
         payload = decodeJWT(token)
         user_id = payload.get("sub")

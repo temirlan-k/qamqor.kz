@@ -7,7 +7,7 @@ from auth.auth_bearer import JWTBearer
 from config.db_dependency import DBSessionDep
 from models.user import User
 from repositories.user_repo import UserRepository
-from schemas.product import CreateProductIn
+from schemas.product import CreateProductIn, ProductOutDB
 from services.product import ProductService, get_product_service
 from services.user import UserService, get_user_service
 
@@ -20,9 +20,9 @@ async def fetch_product_by_id(product_id: UUID, product_service: ProductService 
     return await product_service.get_product_by_id(product_id)
 
 @router.get("/products")
-async def fetch_product_by_categories(cat:List[str] = Query(None),product_service: ProductService = Depends(get_product_service)):
-    """"""
-    return cat
+async def fetch_all_products(category:str = Query(None),product_service: ProductService = Depends(get_product_service)):
+    return await product_service.get_all_products(category)
+
 
 @router.post("/product/create", dependencies=[Depends(JWTBearer())], tags=["products"])
 async def create_product(product_data: CreateProductIn,current_user: UserService = Depends(get_user_service),

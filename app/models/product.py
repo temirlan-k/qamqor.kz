@@ -47,11 +47,12 @@ class Product(Base):
         return {
             "id": str(self.id),
             "category_id": str(self.category_id),
+            "category_name":str(self.category.name),
             "user_id": str(self.user_id),
             "name": self.name,
             "description": self.description,
             "price": self.price,
             "picture": self.picture,
             "created_at": str(self.created_at),
-            "update_time": str(self.update_time)
+            "update_time": str(self.update_time),
         }
