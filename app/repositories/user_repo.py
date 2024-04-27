@@ -6,7 +6,7 @@ from sqlalchemy.future import select
 from utils.hash import hash_password
 from models.user import User
 from schemas.user import UserCreateIn
-from sqlalchemy import insert, or_
+from sqlalchemy import insert, or_,update
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Protocol
 
@@ -26,6 +26,9 @@ class UserProtocol(Protocol):
     async def insert_user(self, user_data: User) -> User:
         ...
 
+    async def update_user(self,user_data:User)->User:
+        ...
+
     async def check_user_exist(self, username_or_email: str)-> bool:
         ...
     
@@ -34,10 +37,10 @@ class UserRepository(UserProtocol):
     def __init__(self, db_session: AsyncSession) -> None:
         self.db_session = db_session
 
-    async def check_user_exist(self, username_or_email: str) -> bool:
+    async def check_user_exist(self, username:str,email: str) -> bool:
         stmt = await self.db_session.execute(
             select(User).where(
-                or_(User.username == username_or_email, User.email == username_or_email)
+                or_(User.username == username, User.email == email)
             )
         )
         return stmt.scalars().first() is not None
@@ -73,6 +76,16 @@ class UserRepository(UserProtocol):
         res = stmt.scalars().all()
         return res
 
+    async def update_user(self,email:str)->User:
+        stmt = await self.db_session.execute(
+            update(User).where(User.email==email).
+                values(is_verified=True)
+                )
+        await self.db_session.commit()
+        stmt = await self.db_session.execute(select(User).filter(User.email == email))
+        res = stmt.scalars().first()
+        return res
+
     async def insert_user(self, user_data: User) -> User:
         if await self.check_user_exist(
             username=user_data.username, email=user_data.email
@@ -90,6 +103,7 @@ class UserRepository(UserProtocol):
         try:
             await self.db_session.commit()
             await self.db_session.refresh(new_user)
+            print('added')
         except SQLAlchemyError as e:
             await self.db_session.rollback()
             raise HTTPException(status_code=400, detail=str(e))

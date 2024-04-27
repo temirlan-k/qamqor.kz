@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 import uvicorn
-from config.redis import get_redis_connection
 from routers.user import router as user_router
 from routers.product import router as product_router
 import logging

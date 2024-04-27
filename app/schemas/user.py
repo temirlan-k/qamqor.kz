@@ -10,6 +10,10 @@ class UserBase(BaseModel):
     last_name: str = Field(..., max_length=64, min_length=2)
 
 
+class UserOut(UserBase):
+    pass
+
+
 class UserCreateIn(UserBase):
     hashed_password: str
 

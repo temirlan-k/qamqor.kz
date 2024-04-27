@@ -31,6 +31,7 @@ class ProductService:
         new_product = await self.product_repository.insert_product(product_data,seller_id)
         return new_product
 
+    
 
 
 

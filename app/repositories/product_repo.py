@@ -40,7 +40,6 @@ class ProductRepository(ProductProtocol):
             raise HTTPException(status_code=404, detail="Product not found")
         product, category_name = product_tuple  
         product_data = {
-        
             "id": str(product.id),
             "category_id": str(product.category_id),
             "user_id": str(product.user_id),
@@ -52,7 +51,7 @@ class ProductRepository(ProductProtocol):
             "update_time": product.update_time,
             "category_name": category_name
         }
-
+    
         return product_data
 
     async def select_product_by_category(self,category_id:List[UUID])->Optional[Product]:

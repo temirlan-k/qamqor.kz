@@ -21,3 +21,5 @@ filetype==1.2.0
 fastapi-cache2==0.2.1
 aioredis==2.0.1
 asyncpg==0.29.0
+celery==5.4.0
+flower==2.0.1

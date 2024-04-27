@@ -5,7 +5,7 @@ from fastapi import File, HTTPException
 from config.settings import settings
 
 
-class AWS_CLIENT:
+class S3_CLIENT:
 
     def __init__(self):
         self.bucket_name = settings.AWS_BUCKET_NAME
@@ -15,6 +15,7 @@ class AWS_CLIENT:
         self.s3_client: boto3 = boto3.client(
             "s3", self.region, self.access_key, self.secret_key
         )
+    
 
     async def upload_product_photo(self, file):
         random_prefix = str(uuid.uuid4())
@@ -31,4 +32,5 @@ class AWS_CLIENT:
             )
 
 
-aws_client = AWS_CLIENT()
+
+aws_client = S3_CLIENT()

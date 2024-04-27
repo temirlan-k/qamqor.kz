@@ -19,7 +19,7 @@ async def fetch_product_by_id(product_id: UUID, product_service: ProductService 
     """Get Product by Id"""
     return await product_service.get_product_by_id(product_id)
 
-@router.get("/products")
+@router.get("/products",tags=['products'])
 async def fetch_all_products(category:str = Query(None),product_service: ProductService = Depends(get_product_service)):
     return await product_service.get_all_products(category)
 
