@@ -2,6 +2,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class UserBase(BaseModel):
+    
     model_config = ConfigDict(from_attributes=True)
 
     username: str = Field(..., max_length=64, min_length=4)
@@ -18,14 +19,7 @@ class UserCreateIn(UserBase):
     hashed_password: str
 
 
-class UserPrivateIn(UserBase):
-    hashed_password: str
-
-
 class UserLoginIn(BaseModel):
     username_or_email: str
     password: str
 
-
-class UserCreateOut(UserBase):
-    access_token: str

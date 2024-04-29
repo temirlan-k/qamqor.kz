@@ -6,7 +6,7 @@ from config.db_dependency import DBSessionDep
 from models.user import User
 
 from repositories.user_repo import UserRepository
-from schemas.user import UserCreateOut, UserCreateIn, UserLoginIn,UserOut
+from schemas.user import  UserCreateIn, UserLoginIn,UserOut
 from services.user import UserService, get_user_service
 
 router = APIRouter()
@@ -49,6 +49,7 @@ async def read_current_user(
     return await user_service.get_current_user(token)
 
 
-@router.post('/verify-account')
+@router.post('/verify-account',tags=['auth'])
 async def verify_account(user_service: UserService = Depends(get_user_service),token: str = Header(None)):
     return await user_service.verify_account(token)
+

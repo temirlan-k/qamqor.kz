@@ -1,6 +1,6 @@
 from typing import List
 from uuid import UUID
-from fastapi import APIRouter, Depends,Query
+from fastapi import APIRouter, Depends, File,Query, UploadFile
 
 from models.category import Category
 from auth.auth_bearer import JWTBearer
@@ -17,19 +17,27 @@ router = APIRouter()
 @router.get("/product/{product_id}", dependencies=[Depends(JWTBearer())], tags=["products"])
 async def fetch_product_by_id(product_id: UUID, product_service: ProductService = Depends(get_product_service)):
     """Get Product by Id"""
-    return await product_service.get_product_by_id(product_id)
+    return await product_service.get_product_by_id(id=product_id)
 
 @router.get("/products",tags=['products'])
-async def fetch_all_products(category:str = Query(None),product_service: ProductService = Depends(get_product_service)):
+async def fetch_all_products(category:list[str] = Query(None),product_service: ProductService = Depends(get_product_service)):
     return await product_service.get_all_products(category)
 
 
 @router.post("/product/create", dependencies=[Depends(JWTBearer())], tags=["products"])
-async def create_product(product_data: CreateProductIn,current_user: UserService = Depends(get_user_service),
+async def create_product(product_data: CreateProductIn,file:UploadFile,current_user: UserService = Depends(get_user_service),
                          product_service: ProductService = Depends(get_product_service),token=Depends(JWTBearer()) ):
-    
     product_seller = await current_user.get_current_user(token)
     created_product = await product_service.create_product(product_data,product_seller.get('id'))
 
     return created_product
+
+@router.get('/products/me', dependencies=[Depends(JWTBearer())],tags=["products"])
+async def fetch_user_products(product_service: ProductService = Depends(get_product_service),
+                              current_user: UserService = Depends(get_user_service),
+                              token=Depends(JWTBearer())):
+    
+    seller_id = await current_user.get_current_user(token)
+    products = await product_service.get_user_products(id=seller_id.get('id'))
+    return products
 

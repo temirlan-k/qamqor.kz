@@ -43,16 +43,4 @@ class Product(Base):
     orders: so.Mapped[List["Order"]] = so.relationship(
         secondary=order_product_association_table, back_populates="products"
     )
-    def to_dict(self):
-        return {
-            "id": str(self.id),
-            "category_id": str(self.category_id),
-            "category_name":str(self.category.name),
-            "user_id": str(self.user_id),
-            "name": self.name,
-            "description": self.description,
-            "price": self.price,
-            "picture": self.picture,
-            "created_at": str(self.created_at),
-            "update_time": str(self.update_time),
-        }
+

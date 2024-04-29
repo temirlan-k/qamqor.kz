@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -22,22 +23,25 @@ class ProductInDB(ProductBase):
     class Config:
         from_attributes = True
 
+
 class ProductOutDB(BaseModel):
-    id: int
+    id:str
     name: str
     description: str
     price: float
-    category_id: int
-    category_name:str
+    picture: str
+    category_name: str
+    created_at: str
+
+    class Config:
+        from_attributes = True
 
     def to_dict(self):
         return {
-            'id': self.id,
-            'name': self.name,
-            'description': self.description,
-            'price': self.price,
-            'category_id': self.category_id,
-            'category_name':self.category_name
+            "name": self.name,
+            "description": self.description,
+            "price": self.price,
+            "picture": self.picture,
+            "category_name": self.category_name,
+            "created_at-": self.created_at
         }
-
-

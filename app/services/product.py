@@ -18,20 +18,29 @@ class ProductService:
         self.redis = redis
 
     @cache_redis(key_prefix="product",cache_type='details', expire=10)
-    async def get_product_by_id(self, product_id: UUID) -> ProductInDB:
-        product = await self.product_repository.select_product_by_id(product_id)
-        return product
+    async def get_product_by_id(self, id: UUID) -> ProductOutDB:
+        """Get Product by product id"""
+        product = await self.product_repository.select_product_by_id(id)
+        return ProductOutDB(**(product)).model_dump() 
     
     @cache_redis(key_prefix='products',cache_type='list',expire=10)
-    async def get_all_products(self,category):
+    async def get_all_products(self,category)-> List[ProductOutDB]:
+        """Get All Products by category"""
         products = await self.product_repository.select_all_products(category)
-        return products
-
+        res = [ProductOutDB(**product).model_dump() for product in products]
+        return res
+        
     async def create_product(self,product_data: CreateProductIn,seller_id:str):
+        """Create new product"""
         new_product = await self.product_repository.insert_product(product_data,seller_id)
         return new_product
 
-    
+    @cache_redis(key_prefix="user-products",cache_type='details', expire=10)
+    async def get_user_products(self,id:UUID)-> List[ProductOutDB]:
+        """Get current user products"""
+        user_products = await self.product_repository.select_user_products(id)
+        res = [ProductOutDB(**product) for product in user_products]
+        return res
 
 
 

@@ -3,7 +3,6 @@ import sqlalchemy as sa
 from sqlalchemy import orm as so
 from uuid import uuid4, UUID
 
-from models.product import Product
 
 from . import Base
 

@@ -27,7 +27,6 @@ class Order(Base):
         primary_key=True, unique=True, index=True, default=uuid.uuid4
     )
     user_id: so.Mapped[uuid.UUID] = so.mapped_column(sa.ForeignKey("users.id"))
-    quantity: so.Mapped[int] = so.mapped_column(default=1)
     total_price: so.Mapped[float] = so.mapped_column()
     contact_phone_number: so.Mapped[str] = so.mapped_column()
     address: so.Mapped[str] = so.mapped_column()
@@ -47,7 +46,6 @@ class Order(Base):
         return {
             'id':self.id,
             'user_id':str(self.user_id),
-            'quantity':self.quantity,
             'total_price':self.total_price,
             'contact_phone_number':self.contact_phone_number,
             'address':self.address,

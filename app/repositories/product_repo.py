@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from models.category import Category
 from models.product import Product
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import desc, select
 
 
 class ProductProtocol(Protocol):
@@ -18,9 +18,11 @@ class ProductProtocol(Protocol):
     async def select_all_products(self) -> Product:
         ...
 
-    async def insert_product(self, user_data: Product,seller_id:UUID) -> Product:
+    async def insert_product(self, product_data: Product,seller_id:UUID) -> Product:
         ...
 
+    async def select_user_products(self,id:UUID)->List[Optional[Product]]:
+        ...
 
 class ProductRepository(ProductProtocol):
 
@@ -35,7 +37,6 @@ class ProductRepository(ProductProtocol):
             .filter(Product.id == id)
         )
         product_tuple = stmt.first()
-        print(product_tuple[0])
         if product_tuple is None:
             raise HTTPException(status_code=404, detail="Product not found")
         product, category_name = product_tuple  
@@ -47,19 +48,20 @@ class ProductRepository(ProductProtocol):
             "description": product.description,
             "price": float(product.price),
             "picture": product.picture,
-            "created_at": product.created_at,
-            "update_time": product.update_time,
+            "created_at": str(product.created_at.strftime('%m/%d/%Y')),
+            "update_time": str(product.update_time),
             "category_name": category_name
         }
-    
+
         return product_data
 
-    async def select_product_by_category(self,category_id:List[UUID])->Optional[Product]:
-        stmt = await self.db_session.execute(select(Product).where(Product.category_id==category_id))
     
-    async def select_all_products(self,category:str) -> List[Product]:
-        stmt = select(Product, Category.name).join(Category, Product.category_id == Category.id)
+    async def select_all_products(self,categories: List[str]) -> List[Product]:
+        stmt = select(Product, Category.name).join(Category, Product.category_id == Category.id).order_by(desc(Product.created_at))
+        if categories:
+            stmt = stmt.where(Category.name.in_(tuple(categories))).order_by(desc(Product.created_at))
         result = await self.db_session.execute(stmt)
+
         products_with_categories = []
         for product, category_name in result:
             product_dict = {
@@ -70,8 +72,8 @@ class ProductRepository(ProductProtocol):
                 "description": product.description,
                 "price": product.price,  
                 "picture": product.picture,
-                "created_at": product.created_at,
-                "update_time": product.update_time,
+                "created_at": str(product.created_at.strftime('%m/%d/%Y')),
+                "update_time": str(product.update_time),
                 "category_name": category_name,
             }
             products_with_categories.append(product_dict)
@@ -96,5 +98,29 @@ class ProductRepository(ProductProtocol):
             raise HTTPException(status_code=400, detail=str(e))
         return new_product
 
+    async def select_user_products(self, seller_id: UUID) -> List[Optional[Product]]:
+        stmt = select(
+            Product,
+            Category.name 
+        ).join(Category, Product.category_id == Category.id)  
 
-            
+        stmt = stmt.where(Product.user_id == seller_id).order_by(desc(Product.created_at))
+
+        result = await self.db_session.execute(stmt)
+        products_with_categories = []
+
+        for product,category in result:
+            product_dict = {
+                "id": str(product.id),
+                "name": product.name,
+                "price": product.price,
+                "created_at": product.created_at.isoformat(),
+                "category_id": str(product.category_id),
+                "user_id": str(product.user_id),
+                "description": product.description,
+                "picture": product.picture,
+                "category_name": category
+            }
+            products_with_categories.append(product_dict)
+
+        return products_with_categories

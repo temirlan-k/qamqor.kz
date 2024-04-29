@@ -65,9 +65,8 @@ class UserService:
         return verified_user    
     
 
-    @cache_redis(key_prefix='user',cache_type='details',expire=30)
     async def get_current_user(self, token: str = Depends(JWTBearer())) -> dict:
-
+        """Get current user data"""
         payload = decodeJWT(token)
         user_id = payload.get("sub")
 
