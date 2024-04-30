@@ -21,3 +21,6 @@ class Category(Base):
     products: so.Mapped[List["Product"]] = so.relationship(
         back_populates="category", cascade="all,delete-orphan"
     )
+
+    # def __str__(self):
+    #     return f'{self.products} ' 

@@ -12,8 +12,8 @@ class S3_CLIENT:
         self.access_key = settings.AWS_ACCESS_KEY
         self.secret_key = settings.AWS_SECRET_KEY
         self.region = settings.AWS_REGION
-        self.s3_client: boto3 = boto3.client(
-            "s3", self.region, self.access_key, self.secret_key
+        self.s3_client = boto3.client(
+            "s3",  region_name='eu-central-1', aws_access_key_id =self.access_key,aws_secret_access_key = self.secret_key
         )
     
 

@@ -6,7 +6,6 @@ class ProductOrder(BaseModel):
     quantity: int
 
 class OrderCreate(BaseModel):
-    user_id: UUID4
     products: List[ProductOrder]
     contact_phone_number: str
     address: str
@@ -16,4 +15,4 @@ class OrderDisplay(BaseModel):
     id: UUID4
     total_price: float
     status: str
-    products: List[ProductOrder]  # You may expand this with more details.
+    products: List[ProductOrder] 

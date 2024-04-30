@@ -71,6 +71,7 @@ class ProductRepository(ProductProtocol):
                 "name": product.name,
                 "description": product.description,
                 "price": product.price,  
+                "quantity":product.quantity,
                 "picture": product.picture,
                 "created_at": str(product.created_at.strftime('%m/%d/%Y')),
                 "update_time": str(product.update_time),
@@ -80,14 +81,15 @@ class ProductRepository(ProductProtocol):
         return products_with_categories
 
 
-    async def insert_product(self, product_data: Product,seller_id:UUID)-> Product:
+    async def insert_product(self, product_data: Product,seller_id:UUID,s3_key:str)-> Product:
         new_product = Product(
             name=product_data.name,
             description=product_data.description,
             price=product_data.price,
-            picture=product_data.picture,
+            picture=s3_key,
             category_id=product_data.category_id,
-            user_id = seller_id
+            user_id = seller_id,
+            quantity=product_data.quantity
         )   
         self.db_session.add(new_product)
         try:
@@ -114,7 +116,8 @@ class ProductRepository(ProductProtocol):
                 "id": str(product.id),
                 "name": product.name,
                 "price": product.price,
-                "created_at": product.created_at.isoformat(),
+                "quantity":product.quantity,
+                "created_at": product.created_at.strftime('%m/%d/%Y'),
                 "category_id": str(product.category_id),
                 "user_id": str(product.user_id),
                 "description": product.description,

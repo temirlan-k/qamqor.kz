@@ -33,3 +33,4 @@ class User(Base):
             'last_name':self.last_name,
             'is_verified':self.is_verified,
         }
+    

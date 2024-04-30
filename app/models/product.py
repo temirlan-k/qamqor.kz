@@ -27,6 +27,7 @@ class Product(Base):
     name: so.Mapped[str] = so.mapped_column(sa.String(255), nullable=False)
     description: so.Mapped[str] = so.mapped_column(sa.Text, nullable=False)
     price: so.Mapped[float] = so.mapped_column()
+    quantity: so.Mapped[int] = so.mapped_column(default=1,nullable=False,autoincrement=False)
     picture: so.Mapped[str] = so.mapped_column()
 
     created_at: so.Mapped[datetime.datetime] = so.mapped_column(

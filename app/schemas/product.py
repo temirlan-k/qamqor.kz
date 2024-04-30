@@ -8,10 +8,13 @@ class ProductBase(BaseModel):
     name: str
     description: str
     price: float
-    picture: str
 
 
-class CreateProductIn(ProductBase):
+class CreateProductIn(BaseModel):
+    name: str
+    description: str
+    price: float
+    quantity:int
     category_id: UUID
 
 
@@ -30,6 +33,7 @@ class ProductOutDB(BaseModel):
     description: str
     price: float
     picture: str
+    quantity:int
     category_name: str
     created_at: str
 

@@ -19,6 +19,10 @@ class ORDER_STATUS_ENUM(enum.Enum):
     IN_DELIVERY = "IN_DELIVERY"
     COMPLETED = "COMPLETED"
 
+    def __str__(self):
+        return self.value
+    
+
 
 class Order(Base):
     __tablename__ = "orders"
@@ -28,10 +32,11 @@ class Order(Base):
     )
     user_id: so.Mapped[uuid.UUID] = so.mapped_column(sa.ForeignKey("users.id"))
     total_price: so.Mapped[float] = so.mapped_column()
+    quantity:so.Mapped[int] = so.mapped_column(default=1)
     contact_phone_number: so.Mapped[str] = so.mapped_column()
     address: so.Mapped[str] = so.mapped_column()
     status: so.Mapped[enum.Enum] = so.mapped_column(
-        sa.Enum(ORDER_STATUS_ENUM, name="order_status_enum")
+        sa.Enum(ORDER_STATUS_ENUM, name="order_status_enum",default=ORDER_STATUS_ENUM.PENDING)
     )
     promo_code: so.Mapped[str | None]
     created_at: so.Mapped[datetime] = so.mapped_column(
@@ -39,16 +44,7 @@ class Order(Base):
     )
 
     products: so.Mapped[List["Product"]] = so.relationship(
-        secondary=order_product_association_table, back_populates="orders"
+        secondary=order_product_association_table, back_populates="orders",lazy='selectin'
     )
 
-    def to_dict(self):
-        return {
-            'id':self.id,
-            'user_id':str(self.user_id),
-            'total_price':self.total_price,
-            'contact_phone_number':self.contact_phone_number,
-            'address':self.address,
-            'status':self.status,
-            'created_at':self.created_at
-        }
+    

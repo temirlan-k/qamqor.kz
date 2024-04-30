@@ -3,9 +3,10 @@ from typing import List
 from uuid import UUID
 
 import aioredis
-from fastapi import HTTPException
+from fastapi import File, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from utils.decarators.cache_decarator import cache_redis
+from utils.aws_s3 import aws_client
 from config.redis import get_redis_connection
 from schemas.product import CreateProductIn, ProductOutDB,ProductInDB
 from config.db_dependency import DBSessionDep
@@ -13,6 +14,7 @@ from repositories.product_repo import ProductProtocol, ProductRepository
 
 
 class ProductService:
+    
     def __init__(self, product_repository: ProductRepository, redis: aioredis.Redis):
         self.product_repository = product_repository
         self.redis = redis
@@ -30,16 +32,17 @@ class ProductService:
         res = [ProductOutDB(**product).model_dump() for product in products]
         return res
         
-    async def create_product(self,product_data: CreateProductIn,seller_id:str):
+    async def create_product(self,product_data: CreateProductIn, seller_id:str,product_picture:UploadFile):
         """Create new product"""
-        new_product = await self.product_repository.insert_product(product_data,seller_id)
+        s3_key = await aws_client.upload_product_photo(product_picture)
+        new_product = await self.product_repository.insert_product(product_data,seller_id,s3_key)
         return new_product
 
     @cache_redis(key_prefix="user-products",cache_type='details', expire=10)
     async def get_user_products(self,id:UUID)-> List[ProductOutDB]:
         """Get current user products"""
         user_products = await self.product_repository.select_user_products(id)
-        res = [ProductOutDB(**product) for product in user_products]
+        res = [ProductOutDB(**product).model_dump() for product in user_products]
         return res
 
 

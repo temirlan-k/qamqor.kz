@@ -45,17 +45,13 @@ class UserRepository(UserProtocol):
         )
         return stmt.scalars().first() is not None
 
-    async def select_by_username_or_email(self, username_or_email: str)->Optional[User]:
-        stmt = await self.db_session.execute(
-            select(User).where(
-                (User.username == username_or_email) | (User.email == username_or_email)
-            )
-        )
-        res = stmt.scalars().first()
-        if res is None:
+    async def select_by_username_or_email(self, username_or_email: str) -> User:
+        stmt = select(User).where((User.username == username_or_email) | (User.email == username_or_email))
+        result = await self.db_session.execute(stmt)
+        user = result.scalar_one_or_none()
+        if user is None:
             raise HTTPException(status_code=404, detail="User not found")
-        print(res)
-        return res
+        return user
 
     async def select_user_by_id(self, id: UUID)-> Optional[User]:
         stmt = await self.db_session.execute(select(User).filter(User.id == id))

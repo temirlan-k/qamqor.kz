@@ -1,6 +1,6 @@
 from typing import List
 from uuid import UUID
-from fastapi import APIRouter, Depends, File,Query, UploadFile
+from fastapi import APIRouter, Depends, File, Form,Query, UploadFile
 
 from models.category import Category
 from auth.auth_bearer import JWTBearer
@@ -25,10 +25,20 @@ async def fetch_all_products(category:list[str] = Query(None),product_service: P
 
 
 @router.post("/product/create", dependencies=[Depends(JWTBearer())], tags=["products"])
-async def create_product(product_data: CreateProductIn,file:UploadFile,current_user: UserService = Depends(get_user_service),
-                         product_service: ProductService = Depends(get_product_service),token=Depends(JWTBearer()) ):
+async def create_product(
+    name: str = Form(...), 
+    description: str = Form(...),
+    price: float = Form(...),
+    category_id: str = Form(...),
+    quantity:int = Form(...),
+    file: UploadFile = File(...),
+    current_user: UserService = Depends(get_user_service),
+    product_service: ProductService = Depends(get_product_service),
+    token = Depends(JWTBearer())
+):
+    product_data = CreateProductIn(name=name, description=description, price=price,quantity=quantity,category_id=category_id)
     product_seller = await current_user.get_current_user(token)
-    created_product = await product_service.create_product(product_data,product_seller.get('id'))
+    created_product = await product_service.create_product(product_data, product_seller.get('id'), file)
 
     return created_product
 
